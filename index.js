@@ -3,6 +3,8 @@ const { request, response } = require("express");
 const express = require("express");
 const app = express();
 
+app.use(express.json());
+
 let notes = [
   {
     id: 1,
@@ -51,6 +53,31 @@ app.delete("/api/notes/:id", (request, response) => {
   const id = Number(request.params.id);
   notes = notes.filter((note) => note.id !== id);
   response.status(204).end();
+});
+
+app.post("/api/notes", (request, response) => {
+  const note = request.body;
+
+  console.log(note);
+
+  if (!note || !note.content) {
+    return response.status(404).json({
+      error: "note content is mising",
+    });
+  }
+
+  const ids = notes.map((note) => note.id);
+  const maxId = Math.max(...ids);
+
+  const newNote = {
+    id: maxId + 1,
+    content: note.content,
+    date: new Date().toISOString(),
+    important: typeof note.important !== "undefined" ? note.important : false,
+  };
+
+  notes = [...notes, newNote];
+  response.json(newNote);
 });
 
 const PORT = 3001;

@@ -1,9 +1,10 @@
-// const http = require('http')
-// const { request, response } = require('express')
 const express = require('express')
 const app = express()
+const logger = require('./middlewares/logger')
 
 app.use(express.json())
+
+app.use(logger)
 
 let notes = [
   {
@@ -25,11 +26,6 @@ let notes = [
     important: true
   }
 ]
-
-// const app = http.createServer((request, response) => {
-//     response.writeHead(200, { 'Content-Type': 'application/json' })
-//     response.end(JSON.stringify(notes))
-// })
 
 app.get('/', (request, response) => {
   response.send('<h1>Hola nuevo mundo</h1>')
@@ -78,6 +74,12 @@ app.post('/api/notes', (request, response) => {
 
   notes = [...notes, newNote]
   response.json(newNote)
+})
+
+app.use((request, response) => {
+  response.status(404).json({
+    error: 'Not found'
+  })
 })
 
 const PORT = 3001
